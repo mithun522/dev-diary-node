@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Table } from "typeorm";
+import { Roles } from "../enum/roles.enum";
 
 @Entity()
 export class User {
@@ -16,6 +17,9 @@ export class User {
 
   @Column({ name: "password" })
   password: string;
+
+  @Column({ name: "role" })
+  role: Roles;
 
   @Column({ name: "created_at" })
   createdAt: Date;

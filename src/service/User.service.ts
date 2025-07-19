@@ -8,6 +8,7 @@ import {
   emailCheck,
   emailWithExistingUser,
 } from "../utils/user-validation.utils";
+import { Roles } from "../enum/roles.enum";
 
 export class UserService {
   constructor() {}
@@ -20,14 +21,13 @@ export class UserService {
     await emailCheck(createUserDto.email);
     await emailWithExistingUser(createUserDto.email);
 
-    console.log(createUserDto);
-
     const hashedPassword = await bcrypt.hash(createUserDto.password, 15);
     const newUser = new User();
     newUser.firstName = createUserDto.firstName;
     newUser.lastName = createUserDto.lastName;
     newUser.email = createUserDto.email;
     newUser.password = hashedPassword;
+    newUser.role = Roles.USER;
     newUser.createdAt = new Date();
     newUser.updatedAt = new Date();
     newUser.avatarUrl = "";
@@ -73,5 +73,14 @@ export class UserService {
 
     if (!updatedUser) throw new NotFoundError("User not found");
     return user;
+  }
+
+  async deleteUser(id: number): Promise<string> {
+    if (!id) throw new BadRequestError("id is required");
+
+    const user = await UserRepository.findOneBy({ id: id });
+    if (!user) throw new NotFoundError("User not found");
+    await UserRepository.delete(id);
+    return "User deleted successfully";
   }
 }
