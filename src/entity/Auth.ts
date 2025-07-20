@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from "typeorm";
 import { User } from "./User";
+import { OtpVerificationStatus } from "../enum/otp-verification";
 
 @Entity()
 export class Auth {
@@ -23,11 +24,17 @@ export class Auth {
   otpExpiresAt: Date;
 
   @Column({ name: "otp_verified", default: false })
-  otpVerified: boolean;
+  otpVerified: OtpVerificationStatus;
 
   @Column({ name: "reset_token", nullable: true })
   resetToken: string;
 
   @Column({ name: "reset_token_expires_at", nullable: true })
   resetTokenExpiresAt: Date;
+
+  @Column({ name: "created_at", nullable: true })
+  createdAt: Date;
+
+  @Column({ name: "updated_at", nullable: true })
+  updatedAt: Date;
 }

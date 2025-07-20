@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../service/User.service";
-import { User } from "../entity/User";
 
 export class UserController {
   userService = new UserService();
@@ -15,19 +14,6 @@ export class UserController {
     try {
       const users = await this.userService.getAllUser();
       res.json(users); // ✅ send response here
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  async createUser(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const user = await this.userService.createUser(req.body);
-      res.json(user);
     } catch (err) {
       next(err);
     }

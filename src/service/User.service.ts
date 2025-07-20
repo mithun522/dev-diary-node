@@ -1,4 +1,3 @@
-import { CreateUserDto } from "../dto/create-user.dto";
 import { User } from "../entity/User";
 import { BadRequestError } from "../error/bad-request.error";
 import { NotFoundError } from "../error/not-found.error";
@@ -8,37 +7,12 @@ import {
   emailCheck,
   emailWithExistingUser,
 } from "../utils/user-validation.utils";
-import { Roles } from "../enum/roles.enum";
 
 export class UserService {
   constructor() {}
 
   async getAllUser(): Promise<User[]> {
     return await UserRepository.find();
-  }
-
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    await emailCheck(createUserDto.email);
-    await emailWithExistingUser(createUserDto.email);
-
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 15);
-    const newUser = new User();
-    newUser.firstName = createUserDto.firstName;
-    newUser.lastName = createUserDto.lastName;
-    newUser.email = createUserDto.email;
-    newUser.password = hashedPassword;
-    newUser.role = Roles.USER;
-    newUser.createdAt = new Date();
-    newUser.updatedAt = new Date();
-    newUser.avatarUrl = "";
-
-    try {
-      const savedUser = await UserRepository.save(newUser);
-      const { password, ...result } = savedUser;
-      return result as User;
-    } catch (error) {
-      throw new Error("Failed to create user " + error.message);
-    }
   }
 
   async getSingleUser(id: number): Promise<User> {

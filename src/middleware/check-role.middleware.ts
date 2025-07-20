@@ -8,7 +8,7 @@ export const checkRole = (requiredRole: Roles) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
     if (token) {
-      const decodedToken = jwt.decode(token);
+      const decodedToken = jwt.decode(token.split(" ")[1]);
       if (decodedToken.role === requiredRole) {
         next();
       } else {
