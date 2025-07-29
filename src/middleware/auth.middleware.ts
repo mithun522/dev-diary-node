@@ -15,8 +15,11 @@ export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const secretKey = process.env.JWT_SECRET as string;
-    const decoded = jwt.verify(token, secretKey);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, secretKey) as {
+      id: number;
+      role: string;
+    };
+    req.user = decoded;
     next();
   } catch (err) {
     throw new ForbiddenError("Invalid token");

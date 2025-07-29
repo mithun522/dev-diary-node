@@ -7,6 +7,7 @@ import {
   emailCheck,
   emailWithExistingUser,
 } from "../utils/user-validation.utils";
+import { instanceToPlain } from "class-transformer";
 
 export class UserService {
   constructor() {}
@@ -15,14 +16,14 @@ export class UserService {
     return await UserRepository.find();
   }
 
-  async getSingleUser(id: number): Promise<User> {
+  async getSingleUser(id: number): Promise<Partial<User>> {
     if (!id) throw new BadRequestError("id is required");
 
     const user = await UserRepository.findOneBy({ id });
 
     if (!user) throw new NotFoundError("User not found");
 
-    return user;
+    return instanceToPlain(user);
   }
 
   async updateUser(id: number, user: User): Promise<User> {

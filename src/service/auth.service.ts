@@ -6,6 +6,7 @@ import { ConflictError } from "../error/conflict.error";
 import { User } from "../entity/User";
 import { CreateUserDto } from "../dto/create-user.dto";
 import {
+  checkForAllRequiredFields,
   emailCheck,
   emailWithExistingUser,
 } from "../utils/user-validation.utils";
@@ -16,24 +17,34 @@ import generateOTP from "../utils/generate-otp.utils";
 import { AuthRepository } from "../repository/auth.repo";
 import { configDotenv } from "dotenv";
 import { OtpVerificationStatus } from "../enum/otp-verification";
+import { generateMailOptions } from "../utils/mail";
+import { generateLoginEmailHtml } from "../templates/welcome";
+import { INCORRECT_PASSWORD, USER_EXISTS } from "../constants/error.constants";
 
 configDotenv();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
 export class AuthService {
-  constructor() {}
+  private transporter;
+
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+  }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
+    await checkForAllRequiredFields<CreateUserDto>(createUserDto, [
+      "firstName",
+      "lastName",
+      "email",
+      "password",
+    ]);
     await emailCheck(createUserDto.email);
     await emailWithExistingUser(createUserDto.email);
-
     const hashedPassword = await bcrypt.hash(createUserDto.password, 15);
     const newUser = new User();
     newUser.firstName = createUserDto.firstName;
@@ -44,13 +55,24 @@ export class AuthService {
     newUser.createdAt = new Date();
     newUser.updatedAt = new Date();
     newUser.avatarUrl = "";
+    const mailOptions = generateMailOptions({
+      to: createUserDto.email,
+      subject: "Welcome to Dev Diary",
+      text: "Welcome to Dev Diary",
+      html: generateLoginEmailHtml(
+        createUserDto.firstName + " " + createUserDto.lastName,
+        createUserDto.email
+      ),
+    });
+
+    await this.transporter.sendMail(mailOptions);
 
     try {
       const savedUser = await UserRepository.save(newUser);
       const { password, ...result } = savedUser;
       return result as User;
     } catch (error) {
-      throw new Error("Failed to create user " + error.message);
+      throw new Error("Failed to create user " + error);
     }
   }
 
@@ -61,13 +83,13 @@ export class AuthService {
     const user = await UserRepository.findOneBy({ email: email });
 
     if (!user) {
-      throw new NotFoundError("User with provided email doesn't exist");
+      throw new NotFoundError(USER_EXISTS);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new ConflictError("Password is incorrect");
+      throw new ConflictError(INCORRECT_PASSWORD);
     }
 
     const token = jwt.sign(
@@ -116,7 +138,7 @@ export class AuthService {
       });
     }
 
-    await transporter.sendMail(mailOptions);
+    await this.transporter.sendMail(mailOptions);
     return { message: "OTP sent successfully" };
   }
 
