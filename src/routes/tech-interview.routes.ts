@@ -5,29 +5,35 @@ const techInterviewRoutes = Router();
 const techInterviewController = new TechInterviewController();
 
 techInterviewRoutes.post(
-  "/techinterview",
+  "/",
   techInterviewController.createTechInterview.bind(techInterviewController)
 );
 
 techInterviewRoutes.get(
-  "/techinterview/:id",
+  "/search",
+  techInterviewController.searchTechInterview.bind(techInterviewController)
+);
+
+techInterviewRoutes.get(
+  "/:id",
   techInterviewController.getTechInterviewByUserId.bind(techInterviewController)
 );
 
 techInterviewRoutes.get(
-  "/techinterview",
+  "/",
   techInterviewController.getTechInterviewByLanguage.bind(
     techInterviewController
   )
 );
 
 techInterviewRoutes.delete(
-  "/techinterview/:id",
+  "/:id",
   techInterviewController.deleteTechInterview.bind(techInterviewController)
 );
 
 techInterviewRoutes.put(
-  "/techinterview/:id",
-  techInterviewController.updateTechInterivew.bind(techInterviewController))
+  "/:id",
+  techInterviewController.updateTechInterivew.bind(techInterviewController)
+);
 
 export default techInterviewRoutes;

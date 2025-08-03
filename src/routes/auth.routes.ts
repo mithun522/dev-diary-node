@@ -4,18 +4,12 @@ import { AuthController } from "../controller/auth.controller";
 const authRoutes = express();
 const authController = new AuthController();
 
+authRoutes.post("/register", authController.createUser.bind(authController));
+authRoutes.post("/login", authController.login.bind(authController));
+authRoutes.post("/otp", authController.sendOtp.bind(authController));
+authRoutes.post("/verifyotp", authController.verifyOtp.bind(authController));
 authRoutes.post(
-  "/auth/register",
-  authController.createUser.bind(authController)
-);
-authRoutes.post("/auth/login", authController.login.bind(authController));
-authRoutes.post("/auth/otp", authController.sendOtp.bind(authController));
-authRoutes.post(
-  "/auth/verifyotp",
-  authController.verifyOtp.bind(authController)
-);
-authRoutes.post(
-  "/auth/resetpassword",
+  "/resetpassword",
   authController.resetPassword.bind(authController)
 );
 

@@ -75,6 +75,7 @@ export class TechInterviewController {
       );
       res.json(techInterview);
     } catch (err) {
+      console.log(err);
       next(err);
     }
   }
@@ -93,6 +94,27 @@ export class TechInterviewController {
       );
       res.json(techInterview);
     } catch (err) {
+      next(err);
+    }
+  }
+
+  async searchTechInterview(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const userId = req.user?.id;
+    const search = req.query.search;
+    const language = req.query.language;
+    try {
+      const techInterview = await this.techInterviewService.searchTechInterview(
+        parseInt(userId),
+        search,
+        language
+      );
+      res.json(techInterview);
+    } catch (err) {
+      console.log(err);
       next(err);
     }
   }

@@ -17,7 +17,9 @@ app.use(
     credentials: true,
   })
 );
-app.use("/api/v1", authRoutes, checkAuth, userRoutes, techInterviewRoutes);
+app.use("/api/v1/auth", authRoutes); // 🔓 No auth
+app.use("/api/v1", checkAuth, userRoutes); // 🔐 Needs auth
+app.use("/api/v1/techinterview", checkAuth, techInterviewRoutes); // 🔐 Needs auth
 
 app.use(errorHandler);
 
