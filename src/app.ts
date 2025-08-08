@@ -6,6 +6,7 @@ import { errorHandler } from "./middleware/error-handler.middleware";
 import authRoutes from "./routes/auth.routes";
 import { checkAuth } from "./middleware/auth.middleware";
 import techInterviewRoutes from "./routes/tech-interview.routes";
+import dsaRoutes from "./routes/dsa-routes";
 
 const app = express();
 
@@ -17,9 +18,13 @@ app.use(
     credentials: true,
   })
 );
-app.use("/api/v1/auth", authRoutes); // 🔓 No auth
-app.use("/api/v1", checkAuth, userRoutes); // 🔐 Needs auth
-app.use("/api/v1/techinterview", checkAuth, techInterviewRoutes); // 🔐 Needs auth
+
+const apiPrefix = "/api/v1";
+
+app.use(`${apiPrefix}/auth`, authRoutes); // 🔓 No auth
+app.use(`${apiPrefix}`, checkAuth, userRoutes); // 🔐 Needs auth
+app.use(`${apiPrefix}/techinterview`, checkAuth, techInterviewRoutes); // 🔐 Needs auth
+app.use(`${apiPrefix}/dsa`, checkAuth, dsaRoutes); // 🔐 Needs auth
 
 app.use(errorHandler);
 

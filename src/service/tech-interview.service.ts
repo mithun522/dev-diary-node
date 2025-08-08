@@ -1,4 +1,4 @@
-import { ILike } from "typeorm";
+import { ILike, UpdateResult } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { TechInterview } from "../entity/TechInterview";
 import { Language } from "../enum/programming-language.enum";
@@ -9,7 +9,10 @@ import { TechInterviewRepo } from "../repository/tech-interview.repo";
 import { checkUserExists } from "../utils/user-validation.utils";
 
 export class TechInterviewService {
-  async createTechInterview(userId: number, techInterviewData: TechInterview) {
+  async createTechInterview(
+    userId: number,
+    techInterviewData: TechInterview
+  ): Promise<TechInterview> {
     try {
       const user = await checkUserExists("id", userId);
 
@@ -34,7 +37,7 @@ export class TechInterviewService {
     }
   }
 
-  async getTechInterviewByUserId(userId: number) {
+  async getTechInterviewByUserId(userId: number): Promise<TechInterview[]> {
     try {
       const techInterview = await TechInterviewRepo.find({
         where: { user: { id: userId } },
@@ -45,7 +48,10 @@ export class TechInterviewService {
     }
   }
 
-  async getTechInterviewByLanguage(userId: number, language: Language) {
+  async getTechInterviewByLanguage(
+    userId: number,
+    language: Language
+  ): Promise<TechInterview[]> {
     try {
       const techInterview = await TechInterviewRepo.find({
         where: {
@@ -53,6 +59,7 @@ export class TechInterviewService {
           language: language,
         },
       });
+      console.log(techInterview);
       return techInterview;
     } catch (error) {
       throw error;
@@ -63,7 +70,7 @@ export class TechInterviewService {
     userId: number,
     techInterviewId: number,
     techInterviewData: TechInterview
-  ) {
+  ): Promise<UpdateResult> {
     if (!userId || !techInterviewId) {
       throw new BadRequestError("Missing required parameters.");
     }

@@ -3,6 +3,7 @@ import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { Auth } from "./entity/Auth";
 import { TechInterview } from "./entity/TechInterview";
+import { Dsa } from "./entity/Dsa";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: "devdiary",
   synchronize: true,
   logging: false,
-  entities: [User, Auth, TechInterview],
+  entities: [User, Auth, TechInterview, Dsa],
   migrations: [],
   subscribers: [],
 });

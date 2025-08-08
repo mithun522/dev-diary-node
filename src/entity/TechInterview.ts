@@ -20,7 +20,7 @@ export class TechInterview {
   @Column({ name: "answer", type: "longtext", nullable: false })
   answer: string;
 
-  @Column({ name: "notes", type: "longtext", default: "" })
+  @Column({ name: "notes", type: "longtext", default: null })
   notes: string;
 
   @Column({ name: "language", nullable: false })
