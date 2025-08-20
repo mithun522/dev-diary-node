@@ -43,8 +43,14 @@ export class Dsa {
   @Column({ name: "link" })
   link: string;
 
-  @Column({ name: "solution", type: "longtext" })
-  solution: string;
+  @Column({ name: "brute_force_solution", type: "longtext" })
+  bruteForceSolution: string;
+
+  @Column({ name: "better_solution", type: "longtext" })
+  betterSolution: string;
+
+  @Column({ name: "optimised_solution", type: "longtext" })
+  optimisedSolution: string;
 
   @Column({ name: "language" })
   language: Language;

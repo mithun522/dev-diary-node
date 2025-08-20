@@ -2,6 +2,8 @@ import { Dsa } from "../entity/Dsa";
 import { NextFunction, Request, AuthenticatedRequest, Response } from "express";
 import { DsaService } from "../service/dsa.service";
 import { UnauthenticatedError } from "../error/unauthenticated.error";
+import { DifficultyLevels } from "../enum/difficulty-levels.enum";
+import { User } from "../entity/User";
 
 export class DsaController {
   private dsaService = new DsaService();
@@ -60,11 +62,26 @@ export class DsaController {
     next: NextFunction
   ): Promise<void> {
     const userId = req.user?.id;
+    const { searchString, difficulty } = req.query as {
+      searchString?: string;
+      difficulty?: string;
+    };
 
     if (!userId) throw new UnauthenticatedError("User is not authenticated");
 
     try {
-      const dsa = await this.dsaService.getDsaByUserId(userId);
+      const difficultyEnum = Object.values(DifficultyLevels).includes(
+        difficulty as DifficultyLevels
+      )
+        ? (difficulty as DifficultyLevels)
+        : DifficultyLevels.NONE;
+
+      const dsa = await this.dsaService.getDsaByUserId(
+        { id: userId } as User,
+        searchString || "",
+        difficultyEnum
+      );
+
       res.json(dsa);
     } catch (err) {
       console.log(err);

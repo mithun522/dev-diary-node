@@ -48,11 +48,13 @@ export class TechInterviewController {
   ): Promise<void> {
     const userId = req.user?.id;
     const language = req.query.language;
+    const page = req.query.page;
     try {
       const techInterview =
         await this.techInterviewService.getTechInterviewByLanguage(
           parseInt(userId),
-          language
+          language,
+          parseInt(page)
         );
       res.json(techInterview);
     } catch (err) {

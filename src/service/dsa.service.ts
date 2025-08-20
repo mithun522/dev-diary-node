@@ -1,4 +1,4 @@
-import { DeleteResult, Not, UpdateResult } from "typeorm";
+import { DeleteResult, ILike, Not, UpdateResult } from "typeorm";
 import { Dsa } from "../entity/Dsa";
 import { ConflictError } from "../error/conflict.error";
 import { DsaRepository } from "../repository/dsa-repo";
@@ -6,6 +6,7 @@ import { checkUserExists } from "../utils/user-validation.utils";
 import { BadRequestError } from "../error/bad-request.error";
 import { NotFoundError } from "../error/not-found.error";
 import { User } from "../entity/User";
+import { DifficultyLevels } from "../enum/difficulty-levels.enum";
 
 export class DsaService {
   async createDsa(user: number, dsa: Dsa): Promise<Dsa> {
@@ -52,15 +53,28 @@ export class DsaService {
     }
   }
 
-  async getDsaByUserId(userId: User): Promise<Dsa[]> {
+  async getDsaByUserId(
+    userId: User,
+    search: string,
+    difficulty: DifficultyLevels = DifficultyLevels.NONE
+  ): Promise<Dsa[]> {
+    console.log(search);
     try {
-      const dsa = await DsaRepository.find({
-        where: { createdBy: userId },
-        order: {
-          createdAt: "DESC",
-        },
-      });
-      return dsa;
+      let query = DsaRepository.createQueryBuilder("dsa")
+        .where("dsa.createdBy = :userId", { userId: userId.id })
+        .orderBy("dsa.createdAt", "DESC");
+
+      if (search && search.trim() !== "") {
+        query = query.andWhere("LOWER(dsa.problem) LIKE LOWER(:search)", {
+          search: `%${search}%`,
+        });
+      }
+
+      if (difficulty !== DifficultyLevels.NONE) {
+        query = query.andWhere("dsa.difficulty = :difficulty", { difficulty });
+      }
+
+      return await query.getMany();
     } catch (err) {
       throw err;
     }

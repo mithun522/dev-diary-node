@@ -50,17 +50,39 @@ export class TechInterviewService {
 
   async getTechInterviewByLanguage(
     userId: number,
-    language: Language
-  ): Promise<TechInterview[]> {
+    language: Language,
+    page: number = 1
+  ): Promise<{
+    techInterview: TechInterview[];
+    techInterviewTotalLength: number;
+  }> {
+    const pageSize = 20;
+    const skip = (page - 1) * pageSize;
+
     try {
       const techInterview = await TechInterviewRepo.find({
         where: {
           user: { id: userId },
           language: language,
         },
+        order: {
+          createdAt: "DESC",
+        },
+        skip,
+        take: pageSize,
       });
-      console.log(techInterview);
-      return techInterview;
+
+      const techInterviewTotalLength = await TechInterviewRepo.count({
+        where: {
+          user: { id: userId },
+          language: language,
+        },
+      });
+
+      return {
+        techInterview,
+        techInterviewTotalLength: techInterviewTotalLength,
+      };
     } catch (error) {
       throw error;
     }
@@ -74,8 +96,6 @@ export class TechInterviewService {
     if (!userId || !techInterviewId) {
       throw new BadRequestError("Missing required parameters.");
     }
-    console.log("Comes in");
-
     try {
       const techInterview = await AppDataSource.getRepository(TechInterview)
         .createQueryBuilder("techInterview")
