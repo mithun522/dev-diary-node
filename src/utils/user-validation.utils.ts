@@ -1,3 +1,4 @@
+import { validate } from "class-validator";
 import { EMAIL_ALREADY_EXISTS } from "../constants/error.constants";
 import { User } from "../entity/User";
 import { BadRequestError } from "../error/bad-request.error";
@@ -35,6 +36,21 @@ export const checkForAllRequiredFields = <T>(
       );
     }
   }
+  return true;
+};
+
+export const validateEntity = async (entity: object, entityName = "Entity") => {
+  const errors = await validate(entity);
+
+  if (errors.length > 0) {
+    // Map class-validator's errors to your custom format
+    const messages = errors
+      .map((err) => Object.values(err.constraints || {}).join(", "))
+      .join("; ");
+
+    throw new BadRequestError(`${entityName} validation failed: ${messages}`);
+  }
+
   return true;
 };
 

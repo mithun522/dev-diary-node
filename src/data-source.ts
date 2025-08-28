@@ -4,6 +4,7 @@ import { User } from "./entity/User";
 import { Auth } from "./entity/Auth";
 import { TechInterview } from "./entity/TechInterview";
 import { Dsa } from "./entity/Dsa";
+import { Blogs } from "./entity/Blog";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
   database: "devdiary",
   synchronize: true,
   logging: false,
-  entities: [User, Auth, TechInterview, Dsa],
+  entities: [User, Auth, TechInterview, Dsa, Blogs],
   migrations: [],
   subscribers: [],
 });
