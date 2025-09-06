@@ -44,6 +44,9 @@ export class Blogs {
   @Column({ default: false })
   published: boolean;
 
+  @Column({ default: false })
+  isDraft: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

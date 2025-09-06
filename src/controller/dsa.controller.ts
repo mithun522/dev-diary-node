@@ -62,16 +62,17 @@ export class DsaController {
     next: NextFunction
   ): Promise<void> {
     const userId = req.user?.id;
-    const { searchString, difficulty } = req.query as {
+    const { searchString, difficulty, pageNumber } = req.query as {
       searchString?: string;
       difficulty?: string;
+      pageNumber: number;
     };
 
     if (!userId) throw new UnauthenticatedError("User is not authenticated");
 
     try {
       const difficultyEnum = Object.values(DifficultyLevels).includes(
-        difficulty as DifficultyLevels
+        difficulty.toUpperCase() as DifficultyLevels
       )
         ? (difficulty as DifficultyLevels)
         : DifficultyLevels.NONE;
@@ -79,12 +80,12 @@ export class DsaController {
       const dsa = await this.dsaService.getDsaByUserId(
         { id: userId } as User,
         searchString || "",
-        difficultyEnum
+        difficultyEnum,
+        pageNumber
       );
 
       res.json(dsa);
     } catch (err) {
-      console.log(err);
       next(err);
     }
   }

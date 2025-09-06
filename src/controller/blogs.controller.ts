@@ -27,10 +27,15 @@ export class BlogsController {
     }
   }
 
-  async getAllBlogs(req: Request, res: Response, next: NextFunction) {
+  async getAllBlogs(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const pageNumber = req.query?.page || 1;
-      const allBlogs = await this.blogsService.getAllBlogs(pageNumber);
+      const userId = req?.user?.id;
+      const allBlogs = await this.blogsService.getAllBlogs(userId, pageNumber);
       return res.json(allBlogs);
     } catch (err: any) {
       next(err);
@@ -40,7 +45,9 @@ export class BlogsController {
   async getPublishedBlogs(req: Request, res: Response, next: NextFunction) {
     try {
       const pageNumber = req.query?.page || 1;
-      const publishedBlogs = this.blogsService.getAllPublishedBlogs(pageNumber);
+      const publishedBlogs = await this.blogsService.getAllPublishedBlogs(
+        pageNumber
+      );
       return res.json(publishedBlogs);
     } catch (err) {
       next(err);
@@ -68,6 +75,7 @@ export class BlogsController {
         userId,
         pageNumber
       );
+      res.json(draftedBlogs);
     } catch (err) {
       next(err);
     }
@@ -88,6 +96,26 @@ export class BlogsController {
       res.json(blogs);
     } catch (err) {
       console.log(err);
+      next(err);
+    }
+  }
+
+  async publishBlog(req: Request, res: Response, next: NextFunction) {
+    try {
+      const blogId = Number(req.params?.id);
+      const blog = await this.blogsService.publishBlog(blogId);
+      return res.json(blog);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async searchBlogs(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { search, page } = req.query;
+      const blogs = await this.blogsService.searchBlogs(search, page);
+      return res.json(blogs);
+    } catch (err) {
       next(err);
     }
   }

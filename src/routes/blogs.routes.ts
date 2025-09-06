@@ -11,17 +11,22 @@ blogsRoutes.get(
   blogsController.getPublishedBlogs.bind(blogsController)
 );
 blogsRoutes.get(
-  "/draft",
-  blogsController.getPublishedBlogs.bind(blogsController)
+  "/published/search",
+  blogsController.searchBlogs.bind(blogsController)
 );
+blogsRoutes.get("/draft", blogsController.getDraftBlogs.bind(blogsController));
 blogsRoutes.get(
   "/user",
   blogsController.getBlogsByUserId.bind(blogsController)
 );
 blogsRoutes.get("/:id", blogsController.getSingleBlog.bind(blogsController));
+blogsRoutes.put(
+  "/publish/:id",
+  blogsController.publishBlog.bind(blogsController)
+);
 blogsRoutes.post(
   "",
-  upload.single("image"), // 👈 name must match formData key
+  upload.single("image"),
   blogsController.createBlogs.bind(blogsController)
 );
 // blogsRoutes.put("/:id", blogsController.updateBlog.bind(blogsController));

@@ -1,4 +1,4 @@
-import { DeleteResult, ILike, Not, UpdateResult } from "typeorm";
+import { DeleteResult, Not, UpdateResult } from "typeorm";
 import { Dsa } from "../entity/Dsa";
 import { ConflictError } from "../error/conflict.error";
 import { DsaRepository } from "../repository/dsa-repo";
@@ -9,6 +9,8 @@ import { User } from "../entity/User";
 import { DifficultyLevels } from "../enum/difficulty-levels.enum";
 
 export class DsaService {
+  private pageSize = 20;
+
   async createDsa(user: number, dsa: Dsa): Promise<Dsa> {
     try {
       const existingUser = await checkUserExists("id", user);
@@ -56,13 +58,15 @@ export class DsaService {
   async getDsaByUserId(
     userId: User,
     search: string,
-    difficulty: DifficultyLevels = DifficultyLevels.NONE
-  ): Promise<Dsa[]> {
-    console.log(search);
+    difficulty: DifficultyLevels = DifficultyLevels.NONE,
+    pageNumber: number = 1
+  ): Promise<any> {
     try {
       let query = DsaRepository.createQueryBuilder("dsa")
         .where("dsa.createdBy = :userId", { userId: userId.id })
-        .orderBy("dsa.createdAt", "DESC");
+        .orderBy("dsa.createdAt", "DESC")
+        .skip((pageNumber - 1) * this.pageSize)
+        .take(this.pageSize);
 
       if (search && search.trim() !== "") {
         query = query.andWhere("LOWER(dsa.problem) LIKE LOWER(:search)", {
@@ -74,7 +78,9 @@ export class DsaService {
         query = query.andWhere("dsa.difficulty = :difficulty", { difficulty });
       }
 
-      return await query.getMany();
+      const [dsa, totalLength] = await query.getManyAndCount();
+
+      return { dsa: dsa, totalLength: totalLength };
     } catch (err) {
       throw err;
     }
@@ -99,6 +105,8 @@ export class DsaService {
       if (existingDsaByLink) {
         throw new ConflictError("DSA already exists");
       }
+
+      dsa.updatedAt = new Date();
 
       const dsaData = await DsaRepository.update(id, dsa);
 
