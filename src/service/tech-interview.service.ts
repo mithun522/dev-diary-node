@@ -37,12 +37,25 @@ export class TechInterviewService {
     }
   }
 
-  async getTechInterviewByUserId(userId: number): Promise<TechInterview[]> {
+  async getTechInterviewByUserId(userId: number, page: number): Promise<any> {
+    const pageSize = 20;
+    const skip = (page - 1) * pageSize;
+    console.log("yes");
     try {
       const techInterview = await TechInterviewRepo.find({
         where: { user: { id: userId } },
+        skip,
+        take: pageSize,
       });
-      return techInterview;
+
+      const techInterviewTotalLength = await TechInterviewRepo.count({
+        where: { user: { id: userId } },
+      });
+
+      return {
+        techInterview,
+        techInterviewTotalLength: techInterviewTotalLength,
+      };
     } catch (error) {
       throw error;
     }

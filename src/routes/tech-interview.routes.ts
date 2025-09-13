@@ -15,7 +15,7 @@ techInterviewRoutes.get(
 );
 
 techInterviewRoutes.get(
-  "/:id",
+  "/user",
   techInterviewController.getTechInterviewByUserId.bind(techInterviewController)
 );
 

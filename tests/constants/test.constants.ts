@@ -1,4 +1,5 @@
 import { CreateUserDto } from "../../src/dto/create-user.dto";
+import { Blogs } from "../../src/entity/Blog";
 import { User } from "../../src/entity/User";
 import { Roles } from "../../src/enum/roles.enum";
 
@@ -30,4 +31,19 @@ export const userDto: CreateUserDto = {
   lastName: "1",
   email: "a@g.com",
   password: "1212",
+};
+
+export const blog: Blogs = {
+  id: 1,
+  title: "1",
+  summary: "1",
+  content: "1",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  image_url: "1",
+  tags: "1",
+  readTime: 1,
+  published: true,
+  isDraft: false,
+  author: user,
 };

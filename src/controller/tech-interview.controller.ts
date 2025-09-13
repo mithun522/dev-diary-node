@@ -25,15 +25,17 @@ export class TechInterviewController {
   }
 
   async getTechInterviewByUserId(
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    const userId = req.params.id;
+    const userId = req.user?.id;
+    const page = req.query.page;
     try {
       const techInterview =
         await this.techInterviewService.getTechInterviewByUserId(
-          parseInt(userId)
+          parseInt(userId),
+          page
         );
       res.json(techInterview);
     } catch (err) {
