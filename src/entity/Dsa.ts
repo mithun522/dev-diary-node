@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 import { ProblemTopics } from "../enum/problem-topics.enum";
 import { Language } from "../enum/programming-language.enum";
-import { User } from "./User";
+import { User } from "./User/User";
 import { DifficultyLevels } from "../enum/difficulty-levels.enum";
 import { ProblemStatus } from "../enum/problem-status";
 

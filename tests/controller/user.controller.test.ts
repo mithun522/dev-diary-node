@@ -2,7 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../../src/service/User.service";
 import { UserController } from "../../src/controller/User.controller";
-import { User } from "../../src/entity/User";
+import { User } from "../../src/entity/User/User";
 import { user } from "../constants/test.constants";
 
 const mockResponse = () => {

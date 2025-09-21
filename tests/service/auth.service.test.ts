@@ -9,7 +9,7 @@ import { Roles } from "../../src/enum/roles.enum";
 import { OtpVerificationStatus } from "../../src/enum/otp-verification";
 import { user, userDto } from "../constants/test.constants";
 import { BadRequestError } from "../../src/error/bad-request.error";
-import { User } from "../../src/entity/User";
+import { User } from "../../src/entity/User/User";
 import {
   EMAIL_ALREADY_EXISTS,
   INCORRECT_PASSWORD,

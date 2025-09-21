@@ -5,7 +5,7 @@ import { DsaRepository } from "../repository/dsa-repo";
 import { checkUserExists } from "../utils/user-validation.utils";
 import { BadRequestError } from "../error/bad-request.error";
 import { NotFoundError } from "../error/not-found.error";
-import { User } from "../entity/User";
+import { User } from "../entity/User/User";
 import { DifficultyLevels } from "../enum/difficulty-levels.enum";
 
 export class DsaService {

@@ -1,4 +1,5 @@
 export enum Language {
+  ALL = "all",
   HTML = "HTML",
   CSS = "CSS",
   JAVASCRIPT = "JAVASCRIPT",

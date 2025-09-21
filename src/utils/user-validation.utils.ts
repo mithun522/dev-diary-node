@@ -1,6 +1,6 @@
 import { validate } from "class-validator";
 import { EMAIL_ALREADY_EXISTS } from "../constants/error.constants";
-import { User } from "../entity/User";
+import { User } from "../entity/User/User";
 import { BadRequestError } from "../error/bad-request.error";
 import { UserRepository } from "../repository/User.repo";
 

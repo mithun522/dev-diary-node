@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "./User";
+import { User } from "./User/User";
 import { IsNotEmpty } from "class-validator";
 
 @Entity()

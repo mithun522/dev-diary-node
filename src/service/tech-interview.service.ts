@@ -40,7 +40,6 @@ export class TechInterviewService {
   async getTechInterviewByUserId(userId: number, page: number): Promise<any> {
     const pageSize = 20;
     const skip = (page - 1) * pageSize;
-    console.log("yes");
     try {
       const techInterview = await TechInterviewRepo.find({
         where: { user: { id: userId } },
@@ -72,12 +71,17 @@ export class TechInterviewService {
     const pageSize = 20;
     const skip = (page - 1) * pageSize;
 
+    const whereCondition: any = {
+      user: { id: userId },
+    };
+
+    if (language !== "all") {
+      whereCondition.language = language;
+    }
+
     try {
       const techInterview = await TechInterviewRepo.find({
-        where: {
-          user: { id: userId },
-          language: language,
-        },
+        where: whereCondition,
         order: {
           createdAt: "DESC",
         },
@@ -86,10 +90,7 @@ export class TechInterviewService {
       });
 
       const techInterviewTotalLength = await TechInterviewRepo.count({
-        where: {
-          user: { id: userId },
-          language: language,
-        },
+        where: whereCondition,
       });
 
       return {

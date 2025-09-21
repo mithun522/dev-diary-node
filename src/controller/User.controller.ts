@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { AuthenticatedRequest, Request, Response, NextFunction } from "express";
 import { UserService } from "../service/User.service";
 
 export class UserController {
@@ -20,12 +20,13 @@ export class UserController {
   }
 
   async getSingleUser(
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
   ): Promise<void> {
+    const userId = req.user?.id;
     try {
-      const user = await this.userService.getSingleUser(req.params.id);
+      const user = await this.userService.getSingleUser(userId);
       res.json(user);
     } catch (err) {
       next(err);
@@ -38,9 +39,10 @@ export class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const user = await this.userService.updateUser(req.params.id, req.body);
+      const user = await this.userService.updateUser(req.params?.id, req.body);
       res.json(user);
     } catch (err) {
+      console.log(err);
       next(err);
     }
   }

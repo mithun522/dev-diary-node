@@ -1,0 +1,61 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Table,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
+import { Roles } from "../../enum/roles.enum";
+import { Exclude } from "class-transformer";
+import { ProfessionalDetails } from "./ProfessionalDetails";
+import { SocialLinks } from "./SocialLinks";
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ name: "first_name" })
+  firstName: string;
+
+  @Column({ name: "last_name", nullable: true })
+  lastName?: string;
+
+  @Column({ name: "email" })
+  email: string;
+
+  @Column({ name: "password" })
+  @Exclude()
+  password: string;
+
+  @Column({ name: "role", default: Roles.USER })
+  role: Roles;
+
+  @Column({ name: "bio", nullable: true })
+  bio?: string;
+
+  @Column({ name: "is_ active", default: false })
+  isActive: boolean;
+
+  @Column({ name: "created_at" })
+  createdAt: Date;
+
+  @Column({ name: "updated_at", nullable: true })
+  updatedAt?: Date;
+
+  @Column({ name: "avatar_url", nullable: true })
+  avatarUrl?: string;
+
+  @OneToOne(() => ProfessionalDetails, {
+    cascade: true,
+    eager: true,
+    nullable: true,
+  })
+  @JoinColumn()
+  professionalDetails?: ProfessionalDetails;
+
+  @OneToOne(() => SocialLinks, { cascade: true, eager: true, nullable: true })
+  @JoinColumn()
+  socialLinks?: SocialLinks;
+}

@@ -11,7 +11,7 @@ userRoutes.get(
   checkRole(Roles.ADMIN),
   userController.getAllUser.bind(userController)
 );
-userRoutes.get("/user/:id", userController.getSingleUser.bind(userController));
+userRoutes.get("/user", userController.getSingleUser.bind(userController));
 userRoutes.put("/user/:id", userController.updateUser.bind(userController));
 userRoutes.delete(
   "/user/:id",

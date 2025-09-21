@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { NotFoundError } from "../error/not-found.error";
 import { ConflictError } from "../error/conflict.error";
-import { User } from "../entity/User";
+import { User } from "../entity/User/User";
 import { CreateUserDto } from "../dto/create-user.dto";
 import {
   checkForAllRequiredFields,

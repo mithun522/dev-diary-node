@@ -1,10 +1,12 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { User } from "./entity/User";
+import { User } from "./entity/User/User";
 import { Auth } from "./entity/Auth";
 import { TechInterview } from "./entity/TechInterview";
 import { Dsa } from "./entity/Dsa";
 import { Blogs } from "./entity/Blog";
+import { ProfessionalDetails } from "./entity/User/ProfessionalDetails";
+import { SocialLinks } from "./entity/User/SocialLinks";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -15,7 +17,15 @@ export const AppDataSource = new DataSource({
   database: "devdiary",
   synchronize: true,
   logging: false,
-  entities: [User, Auth, TechInterview, Dsa, Blogs],
+  entities: [
+    User,
+    Auth,
+    TechInterview,
+    Dsa,
+    Blogs,
+    ProfessionalDetails,
+    SocialLinks,
+  ],
   migrations: [],
   subscribers: [],
 });

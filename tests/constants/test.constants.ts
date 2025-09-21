@@ -1,6 +1,6 @@
 import { CreateUserDto } from "../../src/dto/create-user.dto";
 import { Blogs } from "../../src/entity/Blog";
-import { User } from "../../src/entity/User";
+import { User } from "../../src/entity/User/User";
 import { Roles } from "../../src/enum/roles.enum";
 
 export const user: User = {

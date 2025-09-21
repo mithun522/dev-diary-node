@@ -3,7 +3,7 @@ import { NextFunction, Request, AuthenticatedRequest, Response } from "express";
 import { DsaService } from "../service/dsa.service";
 import { UnauthenticatedError } from "../error/unauthenticated.error";
 import { DifficultyLevels } from "../enum/difficulty-levels.enum";
-import { User } from "../entity/User";
+import { User } from "../entity/User/User";
 
 export class DsaController {
   private dsaService = new DsaService();
