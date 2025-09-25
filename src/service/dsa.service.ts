@@ -98,27 +98,6 @@ export class DsaService {
     }
   }
 
-  /* 
-    output: [
-      {
-        problemsByDifficulty: {
-          easy: 0,
-          medium: 0,
-          hard: 0
-        },
-        problemsByTopic: {
-          Array: 0,
-          String: 0,
-          Dynamic Programming: 0
-        },
-        problemsByLanguage: {
-          cpp: 0,
-          java: 0,
-          python: 0
-        }
-      }
-    ]
-  */
   async getDsaProgressByUser(userId: number): Promise<DsaProgressData[]> {
     try {
       await checkUserExists("id", userId);
@@ -168,7 +147,6 @@ export class DsaService {
 
       return dsaProgress;
     } catch (err) {
-      console.error(err);
       throw err;
     }
   }
@@ -222,10 +200,3 @@ export class DsaService {
     }
   }
 }
-
-const findProblemsByDifficulty = (count: number, dsa) => {
-  if (dsa.difficulty === "EASY") {
-    count++;
-  }
-  return count;
-};
