@@ -6,6 +6,10 @@ const dsaController = new DsaController();
 
 dsaRoutes.get("", dsaController.getAllDsa.bind(dsaController));
 dsaRoutes.get("/user", dsaController.getDsaByUserId.bind(dsaController));
+dsaRoutes.get(
+  "/progress/user",
+  dsaController.getDsaProgressByUser.bind(dsaController)
+);
 dsaRoutes.get("/:id", dsaController.getSingleDsa.bind(dsaController));
 dsaRoutes.post("", dsaController.createDsa.bind(dsaController));
 dsaRoutes.put("/:id", dsaController.updateDsa.bind(dsaController));

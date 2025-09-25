@@ -64,8 +64,7 @@ export class Dsa {
   @Column({ name: "status", default: "UNSOLVED" })
   status: ProblemStatus;
 
-  @ManyToOne(() => User)
-  @Column({ name: "created_by" })
+  @ManyToOne(() => User, (user) => user.dsa)
   @JoinColumn({ name: "created_by" })
   createdBy: User;
 

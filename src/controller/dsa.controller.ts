@@ -90,6 +90,19 @@ export class DsaController {
     }
   }
 
+  async getDsaProgressByUser(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const dsa = await this.dsaService.getDsaProgressByUser(req.user?.id);
+      res.json(dsa);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async updateDsa(
     req: Request,
     res: Response,

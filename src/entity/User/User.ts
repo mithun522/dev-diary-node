@@ -5,11 +5,13 @@ import {
   Table,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { Roles } from "../../enum/roles.enum";
 import { Exclude } from "class-transformer";
 import { ProfessionalDetails } from "./ProfessionalDetails";
 import { SocialLinks } from "./SocialLinks";
+import { Dsa } from "../Dsa";
 
 @Entity()
 export class User {
@@ -58,4 +60,7 @@ export class User {
   @OneToOne(() => SocialLinks, { cascade: true, eager: true, nullable: true })
   @JoinColumn()
   socialLinks?: SocialLinks;
+
+  @OneToMany(() => Dsa, (dsa) => dsa.createdBy)
+  dsa: Dsa[];
 }

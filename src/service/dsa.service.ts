@@ -8,6 +8,18 @@ import { NotFoundError } from "../error/not-found.error";
 import { User } from "../entity/User/User";
 import { DifficultyLevels } from "../enum/difficulty-levels.enum";
 
+interface DsaProgressData {
+  problemsByDifficulty: {
+    [key: string]: number;
+  };
+  problemsByTopic: {
+    [key: string]: number;
+  };
+  problemsByLanguage: {
+    [key: string]: number;
+  };
+}
+
 export class DsaService {
   private pageSize = 20;
 
@@ -86,6 +98,81 @@ export class DsaService {
     }
   }
 
+  /* 
+    output: [
+      {
+        problemsByDifficulty: {
+          easy: 0,
+          medium: 0,
+          hard: 0
+        },
+        problemsByTopic: {
+          Array: 0,
+          String: 0,
+          Dynamic Programming: 0
+        },
+        problemsByLanguage: {
+          cpp: 0,
+          java: 0,
+          python: 0
+        }
+      }
+    ]
+  */
+  async getDsaProgressByUser(userId: number): Promise<DsaProgressData[]> {
+    try {
+      await checkUserExists("id", userId);
+
+      // Get difficulty counts directly from DB
+      const [difficultyCounts] = await DsaRepository.query(`
+          SELECT 
+            SUM(CASE WHEN difficulty = 'EASY' THEN 1 ELSE 0 END) AS easy,
+            SUM(CASE WHEN difficulty = 'MEDIUM' THEN 1 ELSE 0 END) AS medium,
+            SUM(CASE WHEN difficulty = 'HARD' THEN 1 ELSE 0 END) AS hard
+          FROM dsa
+          WHERE created_by = ${userId};
+        `);
+
+      // Get topic counts directly from DB
+      const topicRows = await DsaRepository.query(`
+          SELECT topics FROM dsa WHERE created_by = ${userId};
+        `);
+
+      const topicCounts = topicRows.reduce(
+        (acc: Record<string, number>, row: any) => {
+          let topics: string[];
+          try {
+            topics = JSON.parse(row.topics);
+          } catch {
+            topics = [];
+          }
+          topics.forEach((topic) => {
+            acc[topic] = (acc[topic] || 0) + 1;
+          });
+          return acc;
+        },
+        {}
+      );
+
+      const dsaProgress: DsaProgressData[] = [
+        {
+          problemsByDifficulty: {
+            easy: Number(difficultyCounts.easy) || 0,
+            medium: Number(difficultyCounts.medium) || 0,
+            hard: Number(difficultyCounts.hard) || 0,
+          },
+          problemsByTopic: topicCounts,
+          problemsByLanguage: {}, // Add language aggregation here if needed
+        },
+      ];
+
+      return dsaProgress;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
   async updateDsa(id: number, dsa: Dsa): Promise<UpdateResult> {
     try {
       await checkUserExists("id", dsa.createdBy);
@@ -135,3 +222,10 @@ export class DsaService {
     }
   }
 }
+
+const findProblemsByDifficulty = (count: number, dsa) => {
+  if (dsa.difficulty === "EASY") {
+    count++;
+  }
+  return count;
+};
