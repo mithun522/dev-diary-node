@@ -1,8 +1,9 @@
 import { Response, Request, NextFunction, AuthenticatedRequest } from "express";
 import { BlogsService } from "../service/blogs.service";
+import { BlogRepository } from "../repository/blog.repo";
 
 export class BlogsController {
-  private blogsService = new BlogsService();
+  private blogsService = new BlogsService(BlogRepository);
 
   async createBlogs(
     req: AuthenticatedRequest,
@@ -115,6 +116,36 @@ export class BlogsController {
       const { search, page } = req.query;
       const blogs = await this.blogsService.searchBlogs(search, page);
       return res.json(blogs);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateBlog(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = Number(req.user?.id);
+      const blogId = Number(req.params?.id);
+      const blog = await this.blogsService.updateBlog(blogId, req.body, userId);
+      return res.json(blog);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async deleteBlog(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = Number(req.user?.id);
+      const blogId = Number(req.params?.id);
+      const blog = await this.blogsService.deleteBlog(blogId, userId);
+      return res.json(blog);
     } catch (err) {
       next(err);
     }

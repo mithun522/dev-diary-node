@@ -29,7 +29,7 @@ blogsRoutes.post(
   upload.single("image"),
   blogsController.createBlogs.bind(blogsController)
 );
-// blogsRoutes.put("/:id", blogsController.updateBlog.bind(blogsController));
-// blogsRoutes.delete("/:id", blogsController.deleteBlog.bind(blogsController));
+blogsRoutes.put("/:id", blogsController.updateBlog.bind(blogsController));
+blogsRoutes.delete("/:id", blogsController.deleteBlog.bind(blogsController));
 
 export default blogsRoutes;

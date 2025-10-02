@@ -1,20 +1,21 @@
 import { plainToInstance } from "class-transformer";
 import { Blogs } from "../entity/Blog";
 import { BlogRepository } from "../repository/blog.repo";
-import { UserRepository } from "../repository/User.repo";
 import {
   checkForAllRequiredFields,
   checkUserExists,
   validateEntity,
 } from "../utils/user-validation.utils";
-import { BlogServiceIntervface } from "./service-interface/blog.service-interface";
+import {
+  IBlogService,
+  PaginatedBlogs,
+} from "./service-interface/Iblog.service";
 import { BadRequestError } from "../error/bad-request.error";
-import { ILike } from "typeorm";
+import { DeleteResult, ILike } from "typeorm";
+import { NotFoundError } from "../error/not-found.error";
 
-export class BlogsService implements BlogServiceIntervface {
-  private pageSize = 10;
-
-  constructor() {}
+export class BlogsService implements IBlogService {
+  constructor(private blogRepo: typeof BlogRepository, private pageSize = 10) {}
 
   async createBlogs(blogData: Partial<Blogs>, userId: number): Promise<Blogs> {
     try {
@@ -32,16 +33,19 @@ export class BlogsService implements BlogServiceIntervface {
 
       await validateEntity(newBlog, "Blogs");
 
-      return await BlogRepository.save(newBlog);
+      return await this.blogRepo.save(newBlog);
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
 
-  async getAllBlogs(userId: number, pageNumber: number = 1): Promise<any> {
+  async getAllBlogs(
+    userId: number,
+    pageNumber: number = 1
+  ): Promise<PaginatedBlogs> {
     try {
-      const queryBuilder = BlogRepository.createQueryBuilder("blog")
+      const queryBuilder = this.blogRepo
+        .createQueryBuilder("blog")
         .where("blog.published = :published", { published: true })
         .orWhere("blog.author = :userId", { userId })
         .orderBy("blog.createdAt", "DESC")
@@ -56,15 +60,18 @@ export class BlogsService implements BlogServiceIntervface {
     }
   }
 
-  async getDraftBlogs(userId: number, pageNumber: number = 1): Promise<any> {
+  async getDraftBlogs(
+    userId: number,
+    pageNumber: number = 1
+  ): Promise<PaginatedBlogs> {
     try {
       const existingUser = await checkUserExists("id", userId);
 
-      const totalBlogsLength = await BlogRepository.count({
+      const totalBlogsLength = await this.blogRepo.count({
         where: { isDraft: true },
       });
 
-      const getDraftBlogs = await BlogRepository.find({
+      const getDraftBlogs = await this.blogRepo.find({
         where: {
           author: existingUser,
           isDraft: true,
@@ -72,7 +79,7 @@ export class BlogsService implements BlogServiceIntervface {
         order: {
           createdAt: "DESC",
         },
-        take: 20,
+        take: this.pageSize,
         skip: (pageNumber - 1) * this.pageSize,
       });
 
@@ -82,18 +89,18 @@ export class BlogsService implements BlogServiceIntervface {
     }
   }
 
-  async getAllPublishedBlogs(pageNumber: number = 1): Promise<any> {
+  async getAllPublishedBlogs(pageNumber: number = 1): Promise<PaginatedBlogs> {
     try {
-      const totalBlogsLength = await BlogRepository.count({
+      const totalBlogsLength = await this.blogRepo.count({
         where: { published: true },
       });
 
-      const publishedBlogs = await BlogRepository.find({
+      const publishedBlogs = await this.blogRepo.find({
         where: { published: true },
         order: {
           createdAt: "DESC",
         },
-        take: 20,
+        take: this.pageSize,
         skip: (pageNumber - 1) * this.pageSize,
       });
       return { blogs: publishedBlogs, totalLength: totalBlogsLength };
@@ -102,15 +109,18 @@ export class BlogsService implements BlogServiceIntervface {
     }
   }
 
-  async getBlogsByUserId(userId: number, pageNumber: number = 1): Promise<any> {
+  async getBlogsByUserId(
+    userId: number,
+    pageNumber: number = 1
+  ): Promise<PaginatedBlogs> {
     try {
       const existingUser = await checkUserExists("id", userId);
 
-      const totalBlogs = await BlogRepository.count({
+      const totalBlogs = await this.blogRepo.count({
         where: { author: existingUser },
       });
 
-      const userBlogs = await BlogRepository.find({
+      const userBlogs = await this.blogRepo.find({
         where: { author: existingUser },
         order: {
           createdAt: "DESC",
@@ -127,7 +137,7 @@ export class BlogsService implements BlogServiceIntervface {
 
   async getSingleBlog(id: number): Promise<Blogs> {
     try {
-      const singleBlog = BlogRepository.findOne({
+      const singleBlog = this.blogRepo.findOne({
         where: { id: id },
       });
 
@@ -139,8 +149,7 @@ export class BlogsService implements BlogServiceIntervface {
 
   async publishBlog(id: number): Promise<boolean> {
     try {
-      console.log("id " + id);
-      const existingBlog = await BlogRepository.findOneBy({ id: id });
+      const existingBlog = await this.blogRepo.findOneBy({ id: id });
       if (!existingBlog) {
         throw new BadRequestError("Blog not found");
       }
@@ -148,14 +157,13 @@ export class BlogsService implements BlogServiceIntervface {
       if (existingBlog.published) {
         throw new BadRequestError("Blog already published");
       }
-      await BlogRepository.update(
+      await this.blogRepo.update(
         { id: id },
         { published: true, isDraft: false }
       );
 
       return true;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -166,13 +174,13 @@ export class BlogsService implements BlogServiceIntervface {
         throw new BadRequestError("Query is required");
       }
 
-      const totalBlogs = await BlogRepository.count({
+      const totalBlogs = await this.blogRepo.count({
         where: {
           published: true,
         },
       });
 
-      const blogs = await BlogRepository.find({
+      const blogs = await this.blogRepo.find({
         where: {
           title: ILike(`%${query}%`),
           published: true,
@@ -190,10 +198,48 @@ export class BlogsService implements BlogServiceIntervface {
     }
   }
 
-  updateBlog(id: number, blog: any): Promise<Blogs> {
-    throw new Error("Method not implemented.");
+  async updateBlog(id: number, blog: Blogs, userId: number): Promise<Blogs> {
+    try {
+      if (!id) {
+        throw new BadRequestError("id is required");
+      }
+
+      const existingBlog = await this.blogRepo.findOne({
+        where: { author: { id: userId }, id: id },
+      });
+
+      if (!existingBlog) {
+        throw new NotFoundError("Blog not found");
+      }
+
+      const updatedBlog = this.blogRepo.merge(existingBlog, blog);
+      return await this.blogRepo.save(updatedBlog);
+    } catch (error) {
+      throw error;
+    }
   }
-  deleteBlog(id: number): Promise<void> {
-    throw new Error("Method not implemented.");
+  async deleteBlog(id: number, userId: number): Promise<DeleteResult> {
+    try {
+      if (!id) {
+        throw new BadRequestError("id is required");
+      }
+
+      const existingBlog = await this.blogRepo.findOne({
+        where: { author: { id: userId }, id: id },
+      });
+      if (!existingBlog) {
+        throw new NotFoundError("Blog not found");
+      }
+
+      const result = await this.blogRepo.delete({ id });
+
+      if (result.affected === 0) {
+        throw new NotFoundError("Blog could not be deleted");
+      }
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 }

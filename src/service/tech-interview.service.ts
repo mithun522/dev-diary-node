@@ -159,7 +159,7 @@ export class TechInterviewService {
       if (!techInterview) {
         throw new Error("Tech Interview not found");
       }
-      await TechInterviewRepo.delete(techInterview);
+      await TechInterviewRepo.delete(techInterview.id);
       return "Tech Interview deleted successfully";
     } catch (error) {
       throw error;

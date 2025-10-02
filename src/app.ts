@@ -9,6 +9,7 @@ import techInterviewRoutes from "./routes/tech-interview.routes";
 import dsaRoutes from "./routes/dsa-routes";
 import blogsRoutes from "./routes/blogs.routes";
 import path = require("path");
+import languageRoutes from "./routes/language.routes";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(`${apiPrefix}/auth`, authRoutes); // 🔓 No auth
 app.use(`${apiPrefix}`, checkAuth, userRoutes); // 🔐 Needs auth
 app.use(`${apiPrefix}/techinterview`, checkAuth, techInterviewRoutes); // 🔐 Needs auth
 app.use(`${apiPrefix}/dsa`, checkAuth, dsaRoutes); // 🔐 Needs auth
+app.use(`${apiPrefix}/language`, checkAuth, languageRoutes);
 app.use(`${apiPrefix}/blogs`, checkAuth, blogsRoutes);
 
 app.use(errorHandler);

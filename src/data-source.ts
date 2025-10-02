@@ -7,6 +7,7 @@ import { Dsa } from "./entity/Dsa";
 import { Blogs } from "./entity/Blog";
 import { ProfessionalDetails } from "./entity/User/ProfessionalDetails";
 import { SocialLinks } from "./entity/User/SocialLinks";
+import { LanguageEntity } from "./entity/Language";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -25,6 +26,7 @@ export const AppDataSource = new DataSource({
     Blogs,
     ProfessionalDetails,
     SocialLinks,
+    LanguageEntity,
   ],
   migrations: [],
   subscribers: [],

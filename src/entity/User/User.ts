@@ -12,6 +12,7 @@ import { Exclude } from "class-transformer";
 import { ProfessionalDetails } from "./ProfessionalDetails";
 import { SocialLinks } from "./SocialLinks";
 import { Dsa } from "../Dsa";
+import { LanguageEntity } from "../Language";
 
 @Entity()
 export class User {
@@ -60,6 +61,9 @@ export class User {
   @OneToOne(() => SocialLinks, { cascade: true, eager: true, nullable: true })
   @JoinColumn()
   socialLinks?: SocialLinks;
+
+  @OneToMany(() => LanguageEntity, (language) => language.user)
+  languages: LanguageEntity[];
 
   @OneToMany(() => Dsa, (dsa) => dsa.createdBy)
   dsa: Dsa[];
