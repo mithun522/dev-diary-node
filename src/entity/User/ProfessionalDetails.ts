@@ -21,7 +21,7 @@ export class ProfessionalDetails {
   @Column({ name: "location" })
   location: string;
 
-  @Column("simple-array", { name: "skills" })
+  @Column({ name: "skills", type: "text" })
   skills: string[];
 
   @OneToOne(() => User, (user) => user.professionalDetails)

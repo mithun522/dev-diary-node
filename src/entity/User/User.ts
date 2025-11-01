@@ -52,13 +52,13 @@ export class User {
 
   @OneToOne(() => ProfessionalDetails, {
     cascade: true,
-    eager: true,
+    eager: false,
     nullable: true,
   })
   @JoinColumn()
   professionalDetails?: ProfessionalDetails;
 
-  @OneToOne(() => SocialLinks, { cascade: true, eager: true, nullable: true })
+  @OneToOne(() => SocialLinks, { cascade: true, eager: false, nullable: true })
   @JoinColumn()
   socialLinks?: SocialLinks;
 

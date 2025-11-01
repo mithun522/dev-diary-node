@@ -2,11 +2,7 @@ import { User } from "../entity/User/User";
 import { BadRequestError } from "../error/bad-request.error";
 import { NotFoundError } from "../error/not-found.error";
 import { UserRepository } from "../repository/User.repo";
-import * as bcrypt from "bcrypt";
-import {
-  emailCheck,
-  emailWithExistingUser,
-} from "../utils/user-validation.utils";
+import { emailCheck } from "../utils/user-validation.utils";
 import { instanceToPlain } from "class-transformer";
 
 export class UserService {
@@ -17,13 +13,20 @@ export class UserService {
   }
 
   async getSingleUser(id: number): Promise<Partial<User>> {
-    if (!id) throw new BadRequestError("id is required");
+    try {
+      if (!id) throw new BadRequestError("id is required");
 
-    const user = await UserRepository.findOneBy({ id });
+      const user = await UserRepository.findOne({
+        where: { id },
+        relations: ["socialLinks", "professionalDetails"],
+      });
 
-    if (!user) throw new NotFoundError("User not found");
+      if (!user) throw new NotFoundError("User not found");
 
-    return instanceToPlain(user);
+      return instanceToPlain(user);
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updateUser(id: number, user: User): Promise<User> {

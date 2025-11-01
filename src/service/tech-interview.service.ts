@@ -11,7 +11,7 @@ import { checkUserExists } from "../utils/user-validation.utils";
 export class TechInterviewService {
   async createTechInterview(
     userId: number,
-    techInterviewData: TechInterview
+    techInterviewData: Partial<TechInterview>
   ): Promise<TechInterview> {
     try {
       const user = await checkUserExists("id", userId);
@@ -25,11 +25,19 @@ export class TechInterviewService {
         throw new ConflictError("This question already exists");
       }
 
-      const techInterview = { ...new TechInterview(), ...techInterviewData };
+      const techInterview = TechInterviewRepo.create({
+        ...techInterviewData,
+        user: { id: userId }, // Reference user by ID only
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
-      techInterview.user = user;
-      techInterview.createdAt = new Date();
-      techInterview.updatedAt = new Date();
+      if (
+        techInterviewData.languages &&
+        techInterviewData.languages.length > 0
+      ) {
+        techInterview.languages = techInterviewData.languages;
+      }
 
       return TechInterviewRepo.save(techInterview);
     } catch (error) {
@@ -82,6 +90,7 @@ export class TechInterviewService {
     try {
       const techInterview = await TechInterviewRepo.find({
         where: whereCondition,
+        relations: ["languages"],
         order: {
           createdAt: "DESC",
         },
